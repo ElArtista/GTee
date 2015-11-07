@@ -28,6 +28,8 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
+#include <iostream>
+#include <thread>
 #include <windows.h>
 #include "LoggerWindow.hpp"
 
@@ -41,6 +43,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // Create a logger window
     LoggerWindow lWnd;
 
+    // Spawn reader thread
+    std::thread t(
+        [&lWnd]()
+        {
+            while (!std::cin.eof())
+            {
+                std::string buf;
+                std::getline(std::cin, buf);
+                buf += "\n";
+                lWnd.Log(buf);
+            }
+        }
+    );
+    t.detach();
+
     // Message Loop
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0) > 0)
@@ -48,6 +65,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
+    // Close stdin if still open
+    std::cin.setstate(std::cin.rdstate() | std::ios_base::eofbit);
 
     return 0;
 }
