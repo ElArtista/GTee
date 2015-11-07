@@ -28,27 +28,43 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#include <windows.h>
-#include "LoggerWindow.hpp"
+#ifndef _LOGGER_WINDOW_HPP_
+#define _LOGGER_WINDOW_HPP_
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+#include <string>
+#include "UIElement.hpp"
+
+class LoggerWindow : public UIElement
 {
-    (void) hInstance;
-    (void) hPrevInstance;
-    (void) lpCmdLine;
-    (void) nCmdShow;
+    public:
+        // Constructor
+        LoggerWindow();
+        
+        // Destructor
+        ~LoggerWindow();
 
-    // Create a logger window
-    LoggerWindow lWnd;
+        // Appends the given line to the current window
+        void Log(const std::string& line);
 
-    // Message Loop
-    MSG msg;
-    while (GetMessage(&msg, NULL, 0, 0) > 0)
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
+    private:
+        // The current window handle
+        HWND mHwnd;
 
-    return 0;
-}
+        // Registers the window class
+        void Register();
+        
+        // Spawns the instance of the window associated with this object's lifetime
+        void Create();
+
+        // The WndProc
+        LRESULT CALLBACK MessageHandler(HWND hh, UINT mm, WPARAM ww, LPARAM ll);
+
+        // The Window class name
+        static const TCHAR* wndClassName;
+
+        // The edit control id
+        static const long editCtrlId;
+};
+
+#endif // ! _LOGGER_WINDOW_HPP_
 
